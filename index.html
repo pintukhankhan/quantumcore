@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>QUANTUMCORE — Professional Quantum Calculation Platform</title>
-<meta name="description" content="Professional quantum physics platform. Seven solvers, live graphical simulation, performance telemetry.">
+<meta name="description" content="Professional quantum physics platform. Seven solvers, live graphical simulation, fine-structure / Lamb / Zeeman depth control, performance telemetry.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -116,6 +116,20 @@ h2{font:800 clamp(1.55rem,3.2vw,2.35rem) var(--disp)}
 .led.blink{animation:blink .9s steps(2) infinite}
 @keyframes blink{50%{opacity:.2}}
 .livechip .led{background:var(--gr);box-shadow:0 0 8px rgba(87,232,154,.9);animation:blink 1.4s steps(2) infinite}
+.hpills{display:none;gap:8px;flex-wrap:wrap;margin-bottom:14px;padding:10px 12px;
+  background:linear-gradient(180deg,rgba(8,20,29,.9),rgba(6,15,23,.9));border:1px solid var(--line);border-radius:6px;
+  align-items:center;position:relative}
+.hpills::before{content:"DEPTH";font:600 8.5px var(--mono);letter-spacing:.3em;color:var(--dim);margin-right:6px}
+.hpill{font:700 10px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--mut);
+  background:transparent;border:1px solid var(--line2);border-radius:999px;padding:8px 15px;cursor:pointer;
+  transition:.2s;position:relative}
+.hpill:hover{color:var(--ink);border-color:var(--cyd);transform:translateY(-2px)}
+.hpill.on{color:#04222b;background:var(--cy);border-color:#85f1fa;box-shadow:0 0 16px rgba(83,224,236,.4)}
+.hpill.on[data-l="2"]{color:#06241a;background:var(--gr);border-color:#7df0b4;box-shadow:0 0 16px rgba(87,232,154,.4)}
+.hpill.on[data-l="3"]{color:#2a1c02;background:var(--am);border-color:#ffce7a;box-shadow:0 0 16px rgba(255,184,77,.4)}
+.hpill .dotk{display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin-right:7px;opacity:.55;vertical-align:middle}
+.hpill.on .dotk{opacity:1;box-shadow:0 0 6px currentColor}
+.ctl.dim{opacity:.4;pointer-events:none;filter:grayscale(.4)}
 .controls{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:14px}
 .ctl{background:#08141d;border:1px solid var(--line);border-radius:5px;padding:11px 13px;transition:.2s}
 .ctl:hover{border-color:var(--line2)}
@@ -209,15 +223,6 @@ tr:hover td{background:rgba(83,224,236,.045)}
 .dcell:hover{border-color:var(--cyd);transform:translateY(-2px)}
 .ctable td:first-child{color:var(--am)}
 .ctable td:nth-child(2){color:var(--cy)}
-.steps{display:grid;gap:14px;max-width:980px}
-.step{display:grid;grid-template-columns:70px 1fr;gap:20px;padding:20px;border:1px solid var(--line);border-radius:6px;background:linear-gradient(180deg,var(--p1),var(--p2));transition:.22s}
-.step:hover{border-color:var(--line2);transform:translateX(6px)}
-.stepnum{font:800 30px var(--disp);color:var(--cyd)}
-.step h3{font:700 15px var(--disp);margin-bottom:6px}
-.step p{color:var(--mut);font-size:12.5px;line-height:1.7;margin-bottom:10px}
-.codebox{position:relative;background:#04101a;border:1px solid var(--line);border-radius:5px;padding:14px 16px;font:400 11.5px var(--mono);color:#a8d3de;overflow-x:auto;line-height:1.85;white-space:pre}
-.copy{position:absolute;top:8px;right:8px;font:600 8.5px var(--mono);letter-spacing:.2em;color:var(--mut);background:#0b1c27;border:1px solid var(--line2);border-radius:3px;padding:5px 9px;cursor:pointer;transition:.2s}
-.copy:hover{color:var(--cy);border-color:var(--cyd)}
 footer{border-top:1px solid var(--line);margin-top:30px}
 .foot{max-width:1560px;margin:0 auto;padding:30px 26px 40px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font:400 10px var(--mono);color:var(--dim);letter-spacing:.08em;line-height:1.9}
 .foot b{color:var(--mut)}
@@ -247,7 +252,6 @@ footer{border-top:1px solid var(--line);margin-top:30px}
     <a class="nlink act" data-s="console" href="#console">CONSOLE</a>
     <a class="nlink" data-s="models" href="#models">MODELS</a>
     <a class="nlink" data-s="data" href="#data">DATA</a>
-    <a class="nlink" data-s="deploy" href="#deploy">DEPLOY</a>
   </div>
   <div class="nclock" id="navClock">--:--:--Z</div>
 </nav>
@@ -258,9 +262,9 @@ footer{border-top:1px solid var(--line);margin-top:30px}
     <div>
       <div class="overline">Professional Quantum Calculation Platform</div>
       <h1>QUANTUM<b>CORE</b></h1>
-      <div class="mtag">Seven closed-form solvers · live graphical simulation · full audit trail</div>
+      <div class="mtag">Seven closed-form solvers · live graphical simulation · fine-structure depth control</div>
       <div class="mchips">
-        <span>7 SOLVERS</span><span>CODATA 2018 SI</span><span>SINGLE-FILE · PAGES-READY</span><span id="chipFps">— FPS</span>
+        <span>7 SOLVERS</span><span>CODATA 2018 SI</span><span>BOHR → DIRAC → QED → ZEEMAN</span><span id="chipFps">— FPS</span>
       </div>
     </div>
     <div class="mread">
@@ -298,6 +302,7 @@ footer{border-top:1px solid var(--line);margin-top:30px}
         <div><div class="mname" id="mName">Photon</div><div class="mdesc" id="mDesc"></div></div>
         <div class="livechip"><span class="led"></span>LIVE PREVIEW</div>
       </div>
+      <div class="hpills" id="hPillsWrap"></div>
       <div class="controls" id="controls"></div>
       <div class="runrow">
         <button id="runBtn">▶ Run · Save to Ledger</button>
@@ -343,7 +348,7 @@ footer{border-top:1px solid var(--line);margin-top:30px}
     <div class="mleft rv">
       <div class="overline">Seven Solvers · One Engine</div>
       <h2>Closed-form quantum mechanics, computed live</h2>
-      <p>Every model is non-relativistic, analytical, and traced to CODATA 2018 SI constants. Each returns primary answers, deep derived quantities, and automated physics checks. Select any row to load it into the console.</p>
+      <p>Every model is non-relativistic, analytical, and traced to CODATA 2018 SI constants. The hydrogen solver goes further: a four-pill depth control peels back Bohr → Dirac fine structure → Lamb shift (QED) → Zeeman splitting, each correction stacked and drawn to scale-exaggerated legibility. Select any row to load it into the console.</p>
       <div class="mstats">7 MODELS · 40+ DERIVED QUANTITIES · &lt;1 ms MEDIAN</div>
     </div>
     <div id="modelList"></div>
@@ -377,7 +382,7 @@ footer{border-top:1px solid var(--line);margin-top:30px}
           <tr><td>c</td><td>299 792 458</td><td>m/s (exact)</td></tr>
           <tr><td>e</td><td>1.602 176 634 × 10⁻¹⁹</td><td>C (exact)</td></tr>
           <tr><td>mₑ</td><td>9.109 383 7015 × 10⁻³¹</td><td>kg</td></tr>
-          <tr><td>mₚ</td><td>1.672 621 923 69 × 10⁻²⁷</td><td>kg</td></tr>
+          <tr><td>μ_B</td><td>5.788 381 8060 × 10⁻⁵</td><td>eV/T</td></tr>
           <tr><td>Ry</td><td>13.605 693 122 994</td><td>eV</td></tr>
           <tr><td>a₀</td><td>5.291 772 109 03 × 10⁻¹¹</td><td>m</td></tr>
           <tr><td>α</td><td>7.297 352 5693 × 10⁻³</td><td>—</td></tr>
@@ -387,36 +392,11 @@ footer{border-top:1px solid var(--line);margin-top:30px}
     </div>
   </div>
 </section>
-
-<section id="deploy">
-  <div class="secbar rv"><span class="secnum">04</span><h2>Deploy to GitHub Pages</h2></div>
-  <div class="steps">
-    <div class="step rv"><div class="stepnum">1</div>
-      <div><h3>Create the repository</h3>
-      <p>github.com → <b>New repository</b> → name <b>quantumcore</b> → Public → ✅ Add a README file → Create repository.</p></div>
-    </div>
-    <div class="step rv"><div class="stepnum">2</div>
-      <div><h3>Upload this file</h3>
-      <p>Open the repository → <b>Add file</b> → <b>Upload files</b> → select <b>index.html</b> → Commit changes.</p>
-      <div class="codebox"><button class="copy">COPY</button><code># copy from Termux to phone storage first:
-cp ~/quantum_auto/index.html /sdcard/Download/</code></div></div>
-    </div>
-    <div class="step rv"><div class="stepnum">3</div>
-      <div><h3>Enable GitHub Pages</h3>
-      <p>Repository → <b>Settings</b> → <b>Pages</b> → Branch: <b>main</b> → folder <b>/ (root)</b> → <b>Save</b>.</p></div>
-    </div>
-    <div class="step rv"><div class="stepnum">4</div>
-      <div><h3>Published URL</h3>
-      <p>Live in ~1–2 minutes at:</p>
-      <div class="codebox"><code>https://YOUR_USER.github.io/quantumcore/</code></div></div>
-    </div>
-  </div>
-</section>
 </main>
 
 <footer><div class="foot">
-  <div><b>QUANTUMCORE</b> — professional quantum calculation platform.<br>Single-file build · runs anywhere · GitHub Pages ready.</div>
-  <div>Models: closed-form non-relativistic QM · CODATA 2018 SI.<br>Verify independently before research or engineering use.</div>
+  <div><b>QUANTUMCORE</b> — professional quantum calculation platform.<br>Single-file build · runs anywhere.</div>
+  <div>Models: closed-form non-relativistic QM + Dirac/Lamb/Zeeman depth · CODATA 2018 SI.<br>Verify independently before research or engineering use.</div>
 </div></footer>
 
 <script>
@@ -424,6 +404,8 @@ const H=6.62607015e-34,HBAR=H/(2*Math.PI),C=299792458,E_CHARGE=1.602176634e-19;
 const M_E=9.1093837015e-31,M_P=1.67262192369e-27,M_N=1.67492749804e-27;
 const R_INF=10973731.568160,A0=5.29177210903e-11,RY_EV=13.605693122994,N_A=6.02214076e23,ALPHA=7.2973525693e-3;
 const HC_EV_NM=(H*C/E_CHARGE)*1e9;
+const MU_B_EV=5.7883818060e-5;
+const HZ2EV=H/E_CHARGE;
 const $=id=>document.getElementById(id);
 function pos(x,n){const v=parseFloat(x);if(Number.isNaN(v))throw new Error(n+" must be a number");if(!isFinite(v))throw new Error(n+" must be finite");if(v<=0)throw new Error(n+" must be > 0");return v;}
 function posInt(x,n){const v=parseInt(x,10);if(Number.isNaN(v))throw new Error(n+" must be an integer");if(v<=0)throw new Error(n+" must be > 0");return v;}
@@ -457,6 +439,27 @@ function wlToRGB(w){
   return [Math.round(255*Math.pow(r*f,.8)),Math.round(255*Math.pow(g*f,.8)),Math.round(255*Math.pow(b*f,.8))];
 }
 const rgba=(c,a)=>`rgba(${c[0]},${c[1]},${c[2]},${a})`;
+const SUB={"0":"₀","1":"₁","2":"₂","3":"₃","4":"₄","5":"₅","6":"₆","7":"₇","8":"₈","9":"₉"};
+const TERM="spdfgh";
+function landeG(l,j){if(j<=0)return 0;const s=0.5;return 1+(j*(j+1)+s*(s+1)-l*(l+1))/(2*j*(j+1));}
+function diracE(n,j,Z){const a2=(ALPHA*Z)*(ALPHA*Z);return -RY_EV*Z*Z/(n*n)*(1+a2/(n*n)*(n/(j+0.5)-0.75));}
+function bohrE(n,Z){return -RY_EV*Z*Z/(n*n);}
+function lambEV(n,Z){const hz=(n===1?8172.8e6:n===2?1057.8e6:8172.8e6/(n*n*n))*Math.pow(Z,4);return hz*HZ2EV;}
+function symNLJ(n,l,j){return n+TERM[l]+(SUB[String(Math.round(2*j))]||"?")+"⁄₂";}
+function hLevels(n,Z,depth){
+  const arr=[];
+  for(let l=0;l<n;l++){
+    const js=(l===0)?[0.5]:[l-0.5,l+0.5];
+    for(const j of js){
+      const d=diracE(n,j,Z);
+      const lm=(depth>=2&&l===0)?lambEV(n,Z):0;
+      const g=landeG(l,j);
+      arr.push({n,l,j,sym:symNLJ(n,l,j),dirac:d,lamb:lm,g,e0:d+lm});
+    }
+  }
+  arr.sort((a,b)=>a.e0-b.e0);
+  return {arr,bohr:bohrE(n,Z)};
+}
 const CALC={
 photon(p){
   const wl=pos(p.wavelength_nm,"wavelength_nm"),wlm=wl*1e-9,f=C/wlm,ej=H*f,eev=ej/E_CHARGE;
@@ -496,15 +499,44 @@ harmonic_oscillator(p){
 },
 hydrogen(p){
   const ni=posInt(p.n_initial,"n_initial"),nf=posInt(p.n_final,"n_final"),Z=posInt(p.Z,"Z");
-  const Ei=-Z*Z*RY_EV/(ni*ni),Ef=-Z*Z*RY_EV/(nf*nf),dE=Math.abs(Ef-Ei),dj=dE*E_CHARGE;
+  const depth=Math.max(0,Math.min(3,parseInt(p._depth)||0));
+  const B=Math.max(0,parseFloat(p.B_T)||0);
+  const Ei=bohrE(ni,Z),Ef=bohrE(nf,Z),dE=Math.abs(Ef-Ei),dj=dE*E_CHARGE;
   const dir=ni>nf?"emission":ni<nf?"absorption":"none";
   let ryd=null;if(ni!==nf){const inv=R_INF*Z*Z*Math.abs(1/(nf*nf)-1/(ni*ni));if(inv>0)ryd=1e9/inv;}
-  const checks=["Hydrogen-like non-relativistic model","Ignores fine structure · Lamb shift · Zeeman"];
-  if(ALPHA*Z/Math.min(ni,nf)>0.3)checks.push("WARN: Z/n large — Dirac treatment may be needed");
-  return{primary:{n_initial:ni,n_final:nf,Z,initial_energy_eV:Ei,final_energy_eV:Ef,transition_energy_eV:dE,
-      transition_wavelength_nm:dj>0?HC_EV_NM/dE:null,transition_frequency_Hz:dj>0?dj/H:null,direction:dir},
-    derived:{initial_radius_nm:A0*ni*ni/Z*1e9,final_radius_nm:A0*nf*nf/Z*1e9,speed_initial_m_s:ALPHA*C*Z/ni,speed_final_m_s:ALPHA*C*Z/nf,rydberg_wavelength_nm:ryd},
-    checks,notes:["E_n = −Z²Ry/n²"]};
+  const checks=["Hydrogen-like model","Ignores hyperfine structure"];
+  const notes=["Bohr: E_n = −Z²Ry/n²"];
+  const derived={initial_radius_nm:A0*ni*ni/Z*1e9,final_radius_nm:A0*nf*nf/Z*1e9,
+    speed_initial_m_s:ALPHA*C*Z/ni,speed_final_m_s:ALPHA*C*Z/nf,rydberg_wavelength_nm:ryd};
+  const primary={n_initial:ni,n_final:nf,Z,initial_energy_eV:Ei,final_energy_eV:Ef,transition_energy_eV:dE,
+    transition_wavelength_nm:dj>0?HC_EV_NM/dE:null,transition_frequency_Hz:dj>0?dj/H:null,direction:dir};
+  if(depth>=1){
+    const Li=hLevels(ni,Z,depth),Lf=hLevels(nf,Z,depth);
+    const dircs=Li.arr.map(a=>a.dirac);
+    const fineW=(Math.max(...dircs)-Math.min(...dircs));
+    const sLevel=Li.arr.find(a=>a.l===0);
+    const lambGap=(depth>=2&&sLevel)?sLevel.lamb:0;
+    const gstr=Li.arr.map(a=>`${a.sym}:${fmt(a.g)}`).join("  ");
+    const zMax=depth>=3?Math.max(...Li.arr.map(a=>a.g*MU_B_EV*B*a.j)):0;
+    const topShift=(Math.max(...dircs)-Ei);
+    derived.model_depth=["Bohr","Fine structure","+ Lamb (QED)","+ Zeeman"][depth];
+    derived.dirac_manifold_eV=Li.arr.map(a=>`${a.sym} ${fmt(a.e0)}`).join("  ");
+    derived.fine_structure_width_uV=fineW*1e6;
+    derived.dirac_minus_bohr_uV=topShift*1e6;
+    if(depth>=2)derived.lamb_shift_2s2p_uV=lambGap*1e6;
+    derived.lande_gj=gstr;
+    if(depth>=3){derived.zeeman_max_shift_uV=zMax*1e6;derived.magnetic_field_T=B;}
+    checks[0]=["Bohr only","Dirac fine structure active","Dirac + Lamb (QED) active","Dirac + Lamb + Zeeman active"][depth];
+    checks.push("Splittings drawn exaggerated ×10⁴ — true scale ~ ppm");
+    if(depth>=3)checks.push(B>3?"WARN: B large — Paschen–Back regime, linear Zeeman breaks down":"OK: weak-field linear Zeeman (gⱼμ_B B mⱼ)");
+    notes.push("Dirac: E(n,j)=−Ry·Z²/n²·[1+(αZ)²/n²·(n/(j+½)−¾)]");
+    if(depth>=2)notes.push("Lamb: s-state QED lift (2s−2p₁/₂ = 1057.8 MHz)");
+    if(depth>=3)notes.push("Zeeman: ΔE = gⱼ·μ_B·B·mⱼ");
+  }else{
+    checks.push("Non-relativistic Bohr/Schrödinger model");
+    notes.push("Use the FINE STRUCTURE pills to add Dirac, Lamb, Zeeman.");
+  }
+  return{primary,derived,checks,notes};
 },
 uncertainty(p){
   const mass=pMass(p.mass),dxn=pos(p.delta_x_nm,"delta_x_nm"),dx=dxn*1e-9;
@@ -565,10 +597,11 @@ const MODULES={
     fields:[MASS,{k:"frequency_Hz",label:"Frequency f",unit:"Hz",type:"log",min:11,max:14,step:0.05,def:12},
             {k:"n_initial",label:"n initial",unit:"",min:0,max:6,step:1,def:0},
             {k:"n_final",label:"n final",unit:"",min:0,max:6,step:1,def:1}]},
-  hydrogen:{sym:"H",name:"Hydrogen Atom",desc:"Eₙ = −Z²Ry/n² · Rydberg transitions",tags:"ATOM|RYDBERG",
+  hydrogen:{sym:"H",name:"Hydrogen Atom",desc:"Bohr → Dirac → Lamb → Zeeman depth control",tags:"ATOM|FINE STRUCTURE",
     fields:[{k:"n_initial",label:"n initial",unit:"",min:1,max:10,step:1,def:2},
             {k:"n_final",label:"n final",unit:"",min:1,max:10,step:1,def:1},
-            {k:"Z",label:"Atomic number Z",unit:"",min:1,max:10,step:1,def:1}]},
+            {k:"Z",label:"Atomic number Z",unit:"",min:1,max:10,step:1,def:1},
+            {k:"B_T",label:"Magnetic field B (Zeeman)",unit:"T",min:0,max:10,step:0.05,def:1}]},
   uncertainty:{sym:"Δ",name:"Uncertainty",desc:"Heisenberg — Δx·Δp ≥ ħ/2",tags:"FOUNDATIONS|LIMIT",
     fields:[MASS,{k:"delta_x_nm",label:"Position uncertainty Δx",unit:"nm",min:0.01,max:10,step:0.01,def:0.1}]},
   tunneling:{sym:"⇥",name:"Tunneling",desc:"Barrier transmission T(E, V₀, a)",tags:"BARRIER|TRANSPORT",
@@ -586,6 +619,7 @@ for(const key in MODULES){
     else live[key][f.k]=String(f.def);
   });
 }
+live.hydrogen._depth=0;
 const ro=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");ro.unobserve(e.target);}}),{threshold:.07});
 document.querySelectorAll(".rv").forEach(el=>ro.observe(el));
 function buildRail(){
@@ -599,19 +633,19 @@ function buildRail(){
 function buildControls(){
   $("controls").innerHTML=MODULES[active].fields.map(f=>{
     if(f.type==="select")
-      return `<div class="ctl"><div class="top"><span class="lb">${f.label}</span></div>
+      return `<div class="ctl" data-ctl="${f.k}"><div class="top"><span class="lb">${f.label}</span></div>
         <select data-k="${f.k}">${f.opts.map(o=>`<option ${o===live[active][f.k]?"selected":""}>${o}</option>`).join("")}</select></div>`;
     if(f.type==="text")
-      return `<div class="ctl"><div class="top"><span class="lb">${f.label} <span class="un">${f.unit}</span></span></div>
+      return `<div class="ctl" data-ctl="${f.k}"><div class="top"><span class="lb">${f.label} <span class="un">${f.unit}</span></span></div>
         <input class="mini" style="width:100%" data-k="${f.k}" value="${live[active][f.k]}"></div>`;
     if(f.type==="log"){
       const exp=Math.log10(parseFloat(live[active][f.k])||Math.pow(10,f.def));
-      return `<div class="ctl"><div class="top"><span class="lb">${f.label} <span class="un">log₁₀ ${f.unit}</span></span>
+      return `<div class="ctl" data-ctl="${f.k}"><div class="top"><span class="lb">${f.label} <span class="un">log₁₀ ${f.unit}</span></span>
         <input class="mini" data-k="${f.k}" data-log="1" type="number" step="0.05" value="${exp.toFixed(2)}"></div>
         <input type="range" data-k="${f.k}" data-log="1" min="${f.min}" max="${f.max}" step="${f.step}" value="${exp}">
         <div class="act" id="act_${f.k}">f = ${fmt(parseFloat(live[active][f.k]))} ${f.unit}</div></div>`;
     }
-    return `<div class="ctl"><div class="top"><span class="lb">${f.label} <span class="un">${f.unit}</span></span>
+    return `<div class="ctl" data-ctl="${f.k}"><div class="top"><span class="lb">${f.label} <span class="un">${f.unit}</span></span>
       <input class="mini" data-k="${f.k}" type="number" step="${f.step}" value="${live[active][f.k]}"></div>
       <input type="range" data-k="${f.k}" min="${f.min}" max="${f.max}" step="${f.step}" value="${live[active][f.k]}"></div>`;
   }).join("");
@@ -635,12 +669,32 @@ function buildControls(){
     });
   });
 }
+const HPILLS=[["BOHR",0],["FINE STRUCTURE",1],["+ LAMB",2],["+ ZEEMAN",3]];
+function buildHPills(){
+  $("hPillsWrap").innerHTML=HPILLS.map(([name,l])=>
+    `<button class="hpill" data-l="${l}"><span class="dotk"></span>${name}</button>`).join("");
+  $("hPillsWrap").querySelectorAll(".hpill").forEach(b=>b.onclick=()=>{
+    live.hydrogen._depth=parseInt(b.dataset.l,10);
+    updateHPills();computeLive("hydrogen");
+  });
+}
+function updateHPills(){
+  const d=live.hydrogen._depth||0;
+  $("hPillsWrap").querySelectorAll(".hpill").forEach(b=>{
+    const l=parseInt(b.dataset.l,10);
+    b.classList.toggle("on", l===0 ? d===0 : d>=l);
+  });
+  const bc=document.querySelector('#controls [data-ctl="B_T"]');
+  if(bc)bc.classList.toggle("dim", d<3);
+}
 function switchModule(key){
   active=key;
   document.querySelectorAll(".ritem").forEach(b=>b.classList.toggle("act",b.dataset.k===key));
   const M=MODULES[key];
   $("mSym").textContent=M.sym;$("mName").textContent=M.name;$("mDesc").textContent=M.desc;
+  $("hPillsWrap").style.display=(key==="hydrogen")?"flex":"none";
   buildControls();
+  if(key==="hydrogen"){buildHPills();updateHPills();}
   if(!liveResult[key])computeLive(key);
   paintResult(liveResult[key]);
 }
@@ -889,7 +943,9 @@ function drawOsc(ctx,w,h,t,P){
 }
 function drawHydrogen(ctx,w,h,t,P){
   const ni=Math.max(1,parseInt(P.n_initial)||2),nf=Math.max(1,parseInt(P.n_final)||1),Z=Math.max(1,parseInt(P.Z)||1);
-  const En=n=>-Z*Z*RY_EV/(n*n);
+  const depth=Math.max(0,Math.min(3,parseInt(P._depth)||0));
+  const B=Math.max(0,parseFloat(P.B_T)||0);
+  const En=n=>bohrE(n,Z);
   const Emin=En(1)*1.06,Emax=1.2,yT=26,yB=h-70;
   const yE=E=>yT+(yB-yT)*(Emax-E)/(Emax-Emin);
   grid(ctx,w,h);
@@ -897,44 +953,115 @@ function drawHydrogen(ctx,w,h,t,P){
   ctx.strokeStyle="rgba(132,167,182,.4)";ctx.setLineDash([3,4]);
   ctx.beginPath();ctx.moveTo(36,y0);ctx.lineTo(w*.5,y0);ctx.stroke();ctx.setLineDash([]);
   label(ctx,"E ≥ 0 · continuum",40,y0-7,"rgba(132,167,182,.6)",9);
-  for(let n=1;n<=6;n++){
-    const y=yE(En(n)),act=n===ni||n===nf;
-    ctx.strokeStyle=act?"rgba(83,224,236,.9)":"rgba(83,224,236,.28)";
-    ctx.lineWidth=act?2:1;
-    ctx.beginPath();ctx.moveTo(36,y);ctx.lineTo(w*.5,y);ctx.stroke();
-    label(ctx,`n=${n}  ${fmt(En(n))} eV`,w*.5+8,y+3,act?"#53e0ec":"rgba(132,167,182,.65)",9.5);
-  }
-  const ΔE=Math.abs(En(nf)-En(ni));
-  if(ΔE>0){
-    const λnm=HC_EV_NM/ΔE,col=wlToRGB(λnm);
-    const xa=w*.36,y1=yE(En(ni)),y2=yE(En(nf));
-    ctx.strokeStyle=rgba(col,.95);ctx.lineWidth=2.2;
-    ctx.setLineDash([6,4]);ctx.lineDashOffset=-t*.025;
-    ctx.beginPath();
-    const steps=40;
-    for(let i=0;i<=steps;i++){
-      const y=y1+(y2-y1)*i/steps,x=xa+5*Math.sin(i*.5+t*.006);
-      i?ctx.lineTo(x,y):ctx.moveTo(x,y);
+  if(depth===0){
+    for(let n=1;n<=6;n++){
+      const y=yE(En(n)),act=n===ni||n===nf;
+      ctx.strokeStyle=act?"rgba(83,224,236,.9)":"rgba(83,224,236,.28)";
+      ctx.lineWidth=act?2:1;
+      ctx.beginPath();ctx.moveTo(36,y);ctx.lineTo(w*.5,y);ctx.stroke();
+      label(ctx,`n=${n}  ${fmt(En(n))} eV`,w*.5+8,y+3,act?"#53e0ec":"rgba(132,167,182,.65)",9.5);
     }
-    ctx.stroke();ctx.setLineDash([]);
-    const dy=y2>y1?1:-1;
-    ctx.fillStyle=rgba(col,.95);
-    ctx.beginPath();ctx.moveTo(xa,y2+dy*8);ctx.lineTo(xa-6,y2-dy*3);ctx.lineTo(xa+6,y2-dy*3);ctx.closePath();ctx.fill();
-    label(ctx,`γ ${fmt(λnm)} nm`,xa+14,(y1+y2)/2,rgba(col,.95),10.5);
+    const ΔE=Math.abs(En(nf)-En(ni));
+    if(ΔE>0){
+      const λnm=HC_EV_NM/ΔE,col=wlToRGB(λnm);
+      const xa=w*.36,y1=yE(En(ni)),y2=yE(En(nf));
+      ctx.strokeStyle=rgba(col,.95);ctx.lineWidth=2.2;
+      ctx.setLineDash([6,4]);ctx.lineDashOffset=-t*.025;
+      ctx.beginPath();
+      const steps=40;
+      for(let i=0;i<=steps;i++){const y=y1+(y2-y1)*i/steps,x=xa+5*Math.sin(i*.5+t*.006);i?ctx.lineTo(x,y):ctx.moveTo(x,y);}
+      ctx.stroke();ctx.setLineDash([]);
+      const dy=y2>y1?1:-1;
+      ctx.fillStyle=rgba(col,.95);
+      ctx.beginPath();ctx.moveTo(xa,y2+dy*8);ctx.lineTo(xa-6,y2-dy*3);ctx.lineTo(xa+6,y2-dy*3);ctx.closePath();ctx.fill();
+      label(ctx,`γ ${fmt(λnm)} nm`,xa+14,(y1+y2)/2,rgba(col,.95),10.5);
+    }
+    const cx=w*.76,cy=(yT+yB)/2,Rmax=Math.min(w*.2,(yB-yT)*.44),sc=Rmax/16;
+    for(let n=1;n<=4;n++){
+      const r=n*n*sc,act=n===ni||n===nf;
+      ctx.strokeStyle=n===ni?"rgba(83,224,236,.85)":n===nf?"rgba(87,232,154,.75)":"rgba(83,224,236,.16)";
+      ctx.lineWidth=act?1.6:1;
+      ctx.beginPath();ctx.arc(cx,cy,r,0,6.29);ctx.stroke();
+      label(ctx,"n"+n,cx+r+3,cy+3,"rgba(132,167,182,.5)",8.5);
+    }
+    const rE=ni*ni*sc,ang=t*.0012*Z/(ni*ni*ni)*8;
+    ctx.fillStyle="#53e0ec";ctx.shadowColor="#53e0ec";ctx.shadowBlur=10;
+    ctx.beginPath();ctx.arc(cx+rE*Math.cos(ang),cy+rE*Math.sin(ang),3.5,0,6.29);ctx.fill();ctx.shadowBlur=0;
+    ctx.fillStyle="rgba(255,184,77,.9)";ctx.beginPath();ctx.arc(cx,cy,3,0,6.29);ctx.fill();
+  }else{
+    const xL=w*.07,xR=w*.46,GAP=15;
+    const manif={};
+    [ni,nf].forEach(n=>{
+      const H2=hLevels(n,Z,depth),yC=yE(H2.bohr),k=H2.arr.length;
+      ctx.strokeStyle="rgba(83,224,236,.18)";ctx.lineWidth=1;ctx.setLineDash([2,4]);
+      ctx.beginPath();ctx.moveTo(xL-6,yC);ctx.lineTo(xR+6,yC);ctx.stroke();ctx.setLineDash([]);
+      label(ctx,`n=${n}`,xL-30,yC+3,"rgba(132,167,182,.8)",10);
+      const placed={};
+      H2.arr.forEach((a,r)=>{
+        const y=yC-(r-(k-1)/2)*GAP;
+        placed[a.sym]={y,a};
+        const hot=(n===ni);
+        ctx.strokeStyle=hot?"rgba(83,224,236,.9)":"rgba(106,166,255,.7)";
+        ctx.lineWidth=hot?1.8:1.3;
+        if(hot){ctx.shadowColor="rgba(83,224,236,.6)";ctx.shadowBlur=5;}
+        ctx.beginPath();ctx.moveTo(xL,y);ctx.lineTo(xR,y);ctx.stroke();ctx.shadowBlur=0;
+        label(ctx,a.sym,xR+8,y+3,hot?"#53e0ec":"rgba(106,166,255,.9)",9.5);
+        const offU=(a.e0-H2.bohr)*1e6;
+        if(Math.abs(offU)>1e-4)label(ctx,`${offU>=0?"+":""}${fmt(offU)} µeV`,xR+58,y+3,"rgba(255,184,77,.75)",8);
+        if(depth>=3&&a.j>0){
+          const zsc=4.2;
+          for(let mj=-a.j;mj<=a.j+1e-9;mj+=1){
+            const yy=y-mj*a.g*B*zsc;
+            ctx.strokeStyle="rgba(106,166,255,.55)";ctx.lineWidth=1;
+            ctx.beginPath();ctx.moveTo(xR-7,yy);ctx.lineTo(xR,yy);ctx.stroke();
+            if(Math.abs(mj-a.j)<1e-9)label(ctx,`+${a.j}`,xR+2,yy+2,"rgba(106,166,255,.6)",7);
+            if(Math.abs(mj+a.j)<1e-9)label(ctx,`${-a.j}`,xR+2,yy+2,"rgba(106,166,255,.6)",7);
+          }
+        }
+      });
+      manif[n]=placed;
+      if(depth>=2){
+        const s=placed[symNLJ(n,0,0.5)], p1=placed[symNLJ(n,1,0.5)];
+        if(s&&p1){
+          const ya=s.y,yb=p1.y,xa2=xR+44;
+          ctx.strokeStyle="rgba(87,232,154,.9)";ctx.lineWidth=1.6;
+          ctx.beginPath();ctx.moveTo(xa2,ya+3);ctx.lineTo(xa2,yb-3);ctx.stroke();
+          [ya+3,yb-3].forEach((yy,i)=>{const d=i?-1:1;ctx.beginPath();ctx.moveTo(xa2,yy);ctx.lineTo(xa2-3,yy+d*5);ctx.lineTo(xa2+3,yy+d*5);ctx.closePath();ctx.fillStyle="rgba(87,232,154,.9)";ctx.fill();});
+          label(ctx,`Lamb ${(s.a.lamb*1e6).toFixed(2)} µeV`,xa2+8,(ya+yb)/2+3,"rgba(87,232,154,.95)",8.5);
+        }
+      }
+    });
+    const Li=hLevels(ni,Z,depth),Lf=hLevels(nf,Z,depth);
+    const arrows=[];
+    Li.arr.forEach(a=>Lf.arr.forEach(b=>{
+      if(Math.abs(a.l-b.l)===1&&Math.abs(a.j-b.j)<=1){
+        const dEev=a.e0-b.e0; if(dEev<=0)return;
+        arrows.push({a,b,λ:HC_EV_NM/dEev});
+      }
+    }));
+    const xa=w*.30;
+    arrows.forEach((ar,idx)=>{
+      const y1=manif[ni][ar.a.sym].y, y2=manif[nf][ar.b.sym].y;
+      const col=wlToRGB(ar.λ), xx=xa+idx*7;
+      ctx.strokeStyle=rgba(col,.92);ctx.lineWidth=2;
+      ctx.setLineDash([6,4]);ctx.lineDashOffset=-t*.025;
+      ctx.beginPath();
+      const steps=30;
+      for(let i=0;i<=steps;i++){const y=y1+(y2-y1)*i/steps,x=xx+4*Math.sin(i*.5+t*.006);i?ctx.lineTo(x,y):ctx.moveTo(x,y);}
+      ctx.stroke();ctx.setLineDash([]);
+      const dy=y2>y1?1:-1;
+      ctx.fillStyle=rgba(col,.92);
+      ctx.beginPath();ctx.moveTo(xx,y2+dy*7);ctx.lineTo(xx-5,y2-dy*3);ctx.lineTo(xx+5,y2-dy*3);ctx.closePath();ctx.fill();
+    });
+    if(arrows.length){
+      const λs=arrows.map(a=>a.λ), λc=λs.reduce((p,c)=>p+c,0)/λs.length;
+      label(ctx,arrows.length>1?`multiplet ~ ${fmt(λc)} nm (${arrows.length} lines)`:`γ ${fmt(λc)} nm`,
+        xa+arrows.length*7+10,(yE(En(ni))+yE(En(nf)))/2,rgba(wlToRGB(λc),.95),10);
+    }
+    label(ctx,"E(n,j) = − Ry·Z²/n² · [ 1 + (αZ)²/n² · ( n/(j+½) − ¾ ) ]",w*.52,h*.42,"rgba(255,184,77,.92)",12);
+    label(ctx,"+ Lamb (s-state QED)   + Zeeman  gⱼ·μ_B·B·mⱼ",w*.52,h*.42+20,"rgba(87,232,154,.8)",10);
+    label(ctx,`depth ${depth} · B = ${B.toFixed(2)} T`,w*.52,h*.42+38,"rgba(132,167,182,.75)",9.5);
   }
-  const cx=w*.76,cy=(yT+yB)/2,Rmax=Math.min(w*.2,(yB-yT)*.44),sc=Rmax/16;
-  for(let n=1;n<=4;n++){
-    const r=n*n*sc,act=n===ni||n===nf;
-    ctx.strokeStyle=n===ni?"rgba(83,224,236,.85)":n===nf?"rgba(87,232,154,.75)":"rgba(83,224,236,.16)";
-    ctx.lineWidth=act?1.6:1;
-    ctx.beginPath();ctx.arc(cx,cy,r,0,6.29);ctx.stroke();
-    label(ctx,"n"+n,cx+r+3,cy+3,"rgba(132,167,182,.5)",8.5);
-  }
-  const rE=ni*ni*sc,ang=t*.0012*Z/(ni*ni*ni)*8;
-  ctx.fillStyle="#53e0ec";ctx.shadowColor="#53e0ec";ctx.shadowBlur=10;
-  ctx.beginPath();ctx.arc(cx+rE*Math.cos(ang),cy+rE*Math.sin(ang),3.5,0,6.29);ctx.fill();ctx.shadowBlur=0;
-  ctx.fillStyle="rgba(255,184,77,.9)";
-  ctx.beginPath();ctx.arc(cx,cy,3,0,6.29);ctx.fill();
   const sy=h-40;
   for(let x=36;x<=w-24;x+=3){
     const λl=100+600*(x-36)/(w-60);
@@ -946,10 +1073,18 @@ function drawHydrogen(ctx,w,h,t,P){
     ctx.strokeStyle=tall?"#fff":"rgba(255,255,255,.4)";
     ctx.beginPath();ctx.moveTo(x,sy-(tall?8:0));ctx.lineTo(x,sy+13+(tall?6:0));ctx.stroke();
   };
-  for(let n=2;n<=6;n++)tick(HC_EV_NM/(Z*Z*RY_EV*(1-1/(n*n))),false);
-  for(let n=3;n<=6;n++)tick(HC_EV_NM/(Z*Z*RY_EV*(.25-1/(n*n))),false);
-  if(ΔE>0)tick(HC_EV_NM/ΔE,true);
-  label(ctx,"emission spectrum · 100–700 nm (Lyman + Balmer series)",36,sy-12,"rgba(132,167,182,.7)",9);
+  if(depth===0){
+    for(let n=2;n<=6;n++)tick(HC_EV_NM/(Z*Z*RY_EV*(1-1/(n*n))),false);
+    for(let n=3;n<=6;n++)tick(HC_EV_NM/(Z*Z*RY_EV*(.25-1/(n*n))),false);
+    const ΔE=Math.abs(En(nf)-En(ni)); if(ΔE>0)tick(HC_EV_NM/ΔE,true);
+    label(ctx,"emission spectrum · 100–700 nm (Lyman + Balmer series)",36,sy-12,"rgba(132,167,182,.7)",9);
+  }else{
+    const Li=hLevels(ni,Z,depth),Lf=hLevels(nf,Z,depth);
+    Li.arr.forEach(a=>Lf.arr.forEach(b=>{
+      if(Math.abs(a.l-b.l)===1&&Math.abs(a.j-b.j)<=1){const d=a.e0-b.e0;if(d>0)tick(HC_EV_NM/d,true);}
+    }));
+    label(ctx,"fine-structure multiplet — one Bohr line resolves into several · splittings exaggerated ×10⁴ (true scale ~ ppm)",36,sy-12,"rgba(132,167,182,.75)",9);
+  }
 }
 function drawUncert(ctx,w,h,t,P){
   const dxnm=parseFloat(P.delta_x_nm)||.1,dx=dxnm*1e-9,dp=HBAR/(2*dx);
@@ -1029,12 +1164,8 @@ function drawTunnel(ctx,w,h,t,P){
     ctx.strokeStyle="rgba(220,240,250,.65)";ctx.lineWidth=1.6;ctx.beginPath();
     for(let x=bx0;x<=bx1;x+=2){
       let val;
-      if(below){
-        const κpx=.02+.1*Math.sqrt(Math.max(0,V0-E));
-        val=Math.exp(-(x-bx0)*κpx)*Math.cos(k*2*(x-bx0)-t*.004);
-      }else{
-        val=Math.sqrt(Math.max(T,.02))*Math.cos(k*2.4*(x-bx0)-t*.006);
-      }
+      if(below){const κpx=.02+.1*Math.sqrt(Math.max(0,V0-E));val=Math.exp(-(x-bx0)*κpx)*Math.cos(k*2*(x-bx0)-t*.004);}
+      else{val=Math.sqrt(Math.max(T,.02))*Math.cos(k*2.4*(x-bx0)-t*.006);}
       const y=yc-A*.75*val;x===bx0?ctx.moveTo(x,y):ctx.lineTo(x,y);
     }
     ctx.stroke();
@@ -1216,7 +1347,7 @@ function addLedger(r,ms){
 function commit(key){
   const params=live[key];
   const id=key+"_"+clock().replace(/:/g,"")+"_"+String(++seq).padStart(2,"0");
-  log(`RUN ${id} :: ${key}`,"c-cy");
+  log(`RUN ${id} :: ${key}${key==="hydrogen"?" [depth "+(live.hydrogen._depth||0)+"]":""}`,"c-cy");
   const t0=performance.now();
   const r=runTask(id,key,params);
   const ms=performance.now()-t0;
@@ -1293,13 +1424,8 @@ const spy=new IntersectionObserver(es=>{
     document.querySelectorAll(".nlink").forEach(a=>a.classList.toggle("act",a.dataset.s===e.target.id));
   }});
 },{rootMargin:"-38% 0px -55% 0px"});
-["console","models","data","deploy"].forEach(id=>spy.observe($(id)));
-document.querySelectorAll(".copy").forEach(b=>b.onclick=async()=>{
-  const code=b.parentElement.querySelector("code").innerText;
-  try{await navigator.clipboard.writeText(code);b.textContent="COPIED ✓";setTimeout(()=>b.textContent="COPY",1400);}
-  catch(e){b.textContent="SELECT + COPY";}
-});
-const CONST="h = 6.626 070 15 × 10⁻³⁴ J·s   ·   ħ = 1.054 571 817 × 10⁻³⁴ J·s   ·   c = 299 792 458 m/s   ·   e = 1.602 176 634 × 10⁻¹⁹ C   ·   mₑ = 9.109 383 7015 × 10⁻³¹ kg   ·   Ry = 13.605 693 122 994 eV   ·   a₀ = 5.291 772 109 03 × 10⁻¹¹ m   ·   α ≈ 7.297 352 5693 × 10⁻³   ·   ";
+["console","models","data"].forEach(id=>spy.observe($(id)));
+const CONST="h = 6.626 070 15 × 10⁻³⁴ J·s   ·   ħ = 1.054 571 817 × 10⁻³⁴ J·s   ·   c = 299 792 458 m/s   ·   e = 1.602 176 634 × 10⁻¹⁹ C   ·   μ_B = 5.788 381 8060 × 10⁻⁵ eV/T   ·   Ry = 13.605 693 122 994 eV   ·   α ≈ 7.297 352 5693 × 10⁻³   ·   ";
 $("tick").textContent=CONST+CONST;
 setInterval(()=>{const c=clock()+"Z";$("clock").textContent=c.slice(0,8);$("navClock").textContent=c;},1000);
 $("clock").textContent=clock();
@@ -1327,9 +1453,8 @@ buildModels();
 switchModule("photon");
 drawSparkBig();
 log("QUANTUMCORE ONLINE — 7 graphical solvers loaded","c-ok");
-log("Engine: closed-form non-relativistic QM · CODATA 2018 SI","c-dim");
+log("Hydrogen: 4-pill depth control Bohr → Dirac → Lamb → Zeeman","c-cy");
 log("Masthead: live |0⟩+|1⟩ superposition — hover it to probe |ψ|²","c-cy");
-log("Deploy: single index.html → GitHub Pages (see section 04)","c-dim");
 if(reduced){frame(0);}else{requestAnimationFrame(frame);}
 </script>
 </body>
